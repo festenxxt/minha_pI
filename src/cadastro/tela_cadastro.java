@@ -16,32 +16,78 @@ import javax.swing.table.TableModel;
 public class tela_cadastro extends javax.swing.JFrame {
 
     ArrayList<Marca> ListaDep;
-    
-    public void LoadTableDep(){
-        DefaultTableModel modelo = new DefaultTableModel(new Object[]{"Código","Nome"},0);
-    
-    
+    String modo;
+
+    public void LoadTableDep() {
+        DefaultTableModel modelo = new DefaultTableModel(new Object[]{"Código", "Nome"}, 0);
+
         for (int i = 0; i < ListaDep.size(); i++) {
             Object linha[] = new Object[]{ListaDep.get(i).getCodigo(),
-                                          ListaDep.get(i).getNome()};
+                ListaDep.get(i).getNome()};
             modelo.addRow(linha);
         }
-    
+
         tbl_dep_dpts.setModel((TableModel) modelo);
-        
+
         tbl_dep_dpts.getColumnModel().getColumn(0).setPreferredWidth(50);
         tbl_dep_dpts.getColumnModel().getColumn(1).setPreferredWidth(200);
     }
-    
-    
+
     public tela_cadastro() {
         initComponents();
         setLocationRelativeTo(null);
         ListaDep = new ArrayList();
-        btn_marca_salvar.setEnabled(false);
-        btn_marca_cancelar.setEnabled(false);
-        c_marca_codigo.setEnabled(false);
-        c_marca_nome.setEnabled(false);
+        modo = "Navegar";
+        Manipulamarca();
+    }
+
+    public void Manipulamarca() {
+        switch (modo) {
+            case "Navegar":
+                btn_marca_salvar.setEnabled(false);
+                btn_marca_cancelar.setEnabled(false);
+                c_marca_codigo.setEnabled(false);
+                c_marca_nome.setEnabled(false);
+                break;
+            case "Novo":
+                btn_marca_salvar.setEnabled(true);
+                btn_marca_cancelar.setEnabled(true);
+                c_marca_codigo.setEnabled(true);
+                c_marca_nome.setEnabled(true);
+                btn_marca_editar.setEnabled(false);
+                btn_marca_novo.setEnabled(false);
+                break;
+            case "Editar":
+                btn_marca_salvar.setEnabled(true);
+                btn_marca_cancelar.setEnabled(true);
+                c_marca_codigo.setEnabled(false);
+                c_marca_nome.setEnabled(true);
+                btn_marca_editar.setEnabled(false);
+                btn_marca_novo.setEnabled(true);
+                break;
+            case "Cancelar":
+                btn_marca_salvar.setEnabled(false);
+                btn_marca_cancelar.setEnabled(false);
+                c_marca_codigo.setEnabled(false);
+                c_marca_nome.setEnabled(false);
+                btn_marca_novo.setEnabled(true);
+                btn_marca_editar.setEnabled(true);
+                break;
+            case "Salvar":
+                btn_marca_salvar.setEnabled(false);
+                btn_marca_cancelar.setEnabled(false);
+                c_marca_codigo.setEnabled(false);
+                c_marca_nome.setEnabled(false);
+                btn_marca_novo.setEnabled(true);
+                btn_marca_editar.setEnabled(true);
+                c_marca_codigo.setText("");
+                c_marca_nome.setText("");
+                break;
+
+            default:
+                System.out.println("Modo inválido");
+
+        }
     }
 
     /**
@@ -66,7 +112,6 @@ public class tela_cadastro extends javax.swing.JFrame {
         btn_marca_cancelar = new javax.swing.JButton();
         btn_marca_novo = new javax.swing.JButton();
         btn_marca_editar = new javax.swing.JButton();
-        btn_marca_excluir = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -92,6 +137,11 @@ public class tela_cadastro extends javax.swing.JFrame {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        tbl_dep_dpts.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbl_dep_dptsMouseClicked(evt);
             }
         });
         jScrollPane1.setViewportView(tbl_dep_dpts);
@@ -140,7 +190,7 @@ public class tela_cadastro extends javax.swing.JFrame {
                                 .addGap(52, 52, 52)
                                 .addComponent(btn_marca_cancelar))
                             .addComponent(c_marca_nome, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 29, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -167,8 +217,11 @@ public class tela_cadastro extends javax.swing.JFrame {
         });
 
         btn_marca_editar.setText("Editar");
-
-        btn_marca_excluir.setText("Excluir");
+        btn_marca_editar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_marca_editarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -182,8 +235,7 @@ public class tela_cadastro extends javax.swing.JFrame {
                         .addComponent(btn_marca_novo, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_marca_editar, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
-                        .addComponent(btn_marca_excluir, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(80, 80, 80))
         );
         jPanel1Layout.setVerticalGroup(
@@ -193,14 +245,11 @@ public class tela_cadastro extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_marca_novo)
-                    .addComponent(btn_marca_editar)
-                    .addComponent(btn_marca_excluir))
+                    .addComponent(btn_marca_editar))
                 .addGap(18, 18, 18)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-
-        jPanel3.getAccessibleContext().setAccessibleName("Marca");
 
         jTabbedPane1.addTab("Marca", jPanel1);
 
@@ -234,24 +283,53 @@ public class tela_cadastro extends javax.swing.JFrame {
     private void btn_marca_novoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_marca_novoActionPerformed
         c_marca_codigo.setText("");
         c_marca_nome.setText("");
-        
-        btn_marca_salvar.setEnabled(true);
-        btn_marca_cancelar.setEnabled(true);
-        c_marca_codigo.setEnabled(true);
-        c_marca_nome.setEnabled(true);
+        modo = "Novo";
+        Manipulamarca();
+
     }//GEN-LAST:event_btn_marca_novoActionPerformed
 
     private void btn_marca_cancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_marca_cancelarActionPerformed
-        btn_marca_salvar.setEnabled(false);
-        btn_marca_cancelar.setEnabled(false);
+        modo = "Cancelar";
+        Manipulamarca();
     }//GEN-LAST:event_btn_marca_cancelarActionPerformed
 
     private void btn_marca_salvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_marca_salvarActionPerformed
         int cod = Integer.parseInt(c_marca_codigo.getText());
-        Marca D = new Marca(cod, c_marca_nome.getText());
-        ListaDep.add(D);
+        if (modo.equals("Novo")) {
+            Marca D = new Marca(cod, c_marca_nome.getText());
+            ListaDep.add(D);
+        } else if (modo.equals("Editar")) {
+            int index = tbl_dep_dpts.getSelectedRow();
+            ListaDep.get(index).setNome(c_marca_nome.getText());
+        }
         LoadTableDep();
+        modo = "Salvar";
+        Manipulamarca();
+        c_marca_codigo.setText("");
+        c_marca_nome.setText("");
     }//GEN-LAST:event_btn_marca_salvarActionPerformed
+
+    private void btn_marca_editarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_marca_editarActionPerformed
+        modo = "Editar";
+        Manipulamarca();
+    }//GEN-LAST:event_btn_marca_editarActionPerformed
+
+    private void tbl_dep_dptsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_dep_dptsMouseClicked
+
+        int index = tbl_dep_dpts.getSelectedRow();
+        if (index >= 0 && index < ListaDep.size()) {
+            Marca M = ListaDep.get(index);
+            c_marca_codigo.setText(String.valueOf(M.getCodigo()));
+
+            c_marca_nome.setText(M.getNome());
+            btn_marca_salvar.setEnabled(true);
+            btn_marca_cancelar.setEnabled(true);
+            c_marca_codigo.setEnabled(false);
+            c_marca_nome.setEnabled(false);
+            btn_marca_novo.setEnabled(false);
+            btn_marca_editar.setEnabled(true);
+        }
+    }//GEN-LAST:event_tbl_dep_dptsMouseClicked
 
     /**
      * @param args the command line arguments
@@ -291,7 +369,6 @@ public class tela_cadastro extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_marca_cancelar;
     private javax.swing.JButton btn_marca_editar;
-    private javax.swing.JButton btn_marca_excluir;
     private javax.swing.JButton btn_marca_novo;
     private javax.swing.JButton btn_marca_salvar;
     private javax.swing.JTextField c_marca_codigo;
